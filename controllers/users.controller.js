@@ -1,34 +1,91 @@
-export function getAllUsers(request, response) {
-    return response.json({
-        message: 'GET API'
-    });
+import bcrypt from 'bcryptjs';
+import User from '../models/User.js';
+
+
+export async function getAllUsers(request, response) {
+    try {
+        const { limit = 5, skip = 0 } = request.query;
+
+        const [total, user] = await Promise.all([
+            User.countDocuments({ status: true }),
+            User.find({ status: true }).skip(skip).limit(limit)
+        ])
+    
+        return response.json({
+            ok: true,
+            total,
+            user
+        });    
+    } catch (error) {
+        return response.status(500).json({
+            ok: false,
+            error
+        });
+    }
 }
 
-export function createUser(request, response) {
-    const body = request.body;
-  
-    return response.json({
-        message: 'POST API',
-        body
-    });
+export async function createUser(request, response) {
+    try { 
+        const { name, email, password, role } = request.body;
+        const user = new User({ name, email, password, role });
+        
+        /** Encriptar la contraseña */
+        const salt = bcrypt.genSaltSync();
+        user.password = bcrypt.hashSync(password, salt);
+    
+        await user.save();
+      
+        return response.json({
+            ok: true,
+            message: 'POST API',
+            user
+        });  
+    } catch (error) {
+      return response.status(500).json({
+        ok: false,
+        error
+      })  
+    }
 }
 
-export function updatedUser(request, response) {
-    const queryParams = request.query;
+export async function updatedUser(request, response) {
+    try {
+        const { id } = request.params;
+        const { password, google, ...rest } = request.body;
 
-    console.log(queryParams);
-    console.log(request.params.id);
-    return response.json({
-        message: 'PUT API',
-        id: request.params.id,
-        ...queryParams
-    });
+        if ( password ) {
+            /** Encriptar la contraseña */
+            const salt = bcrypt.genSaltSync();
+            rest.password = bcrypt.hashSync(password, salt);
+        }
+
+        const user = await User.findByIdAndUpdate( id, rest, { context: true } );
+        return response.json({
+            ok: true,
+            user
+        });  
+    } catch (error) {
+        return response.status(500).json({
+            ok: false,
+            error
+        }); 
+    }
 }
 
-export function deletedUser(request, response) {
-    const { id } = request.params;
-
-    return response.json({
-        message: 'DELETED API'
-    });
+export async function deletedUser(request, response) {
+    try {
+        const { id } = request.params;
+        /** Eliminado lógico  */
+        const user = await User.findByIdAndUpdate(id, { state: false });
+    
+        return response.json({
+            ok: true,
+            user
+        });  
+    } catch (error) {
+        response.status(500).json({
+            ok: false,
+            error
+        }); 
+    }
 }
