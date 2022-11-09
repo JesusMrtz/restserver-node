@@ -38,8 +38,11 @@ const userSchema = Schema({
  * @returns Removemos la propiedad password y __v al enviar el usuario en todos los metodos que utilicen el model User a nivel global
  */
 userSchema.methods.toJSON = function() {
-    const { password, __v, ...user } = this.toObject();
-    return user;
+    const { password, __v, _id: uid, ...user } = this.toObject();
+    return {
+        uid,
+        ...user
+    };
 }
 
 

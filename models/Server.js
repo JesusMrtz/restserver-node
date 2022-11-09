@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import v1Users from '../v1/routes/users.routes.js';
+import v1Auth from '../v1/routes/auth.routes.js';
 import { dbConnection } from '../db/config.db.js';
 
 
@@ -36,7 +37,8 @@ export class Server {
     }
 
     routes() {
-        this.app.use('/api/v1/users', v1Users)
+        this.app.use('/api/v1/auth', v1Auth);
+        this.app.use('/api/v1/users', v1Users);
     }
 
     listen() {

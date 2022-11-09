@@ -80,7 +80,8 @@ export async function deletedUser(request, response) {
     
         return response.json({
             ok: true,
-            user
+            user,
+            authenticatedUser: request.authenticatedUser
         });  
     } catch (error) {
         response.status(500).json({

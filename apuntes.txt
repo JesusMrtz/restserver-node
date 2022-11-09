@@ -1,0 +1,7 @@
+El JWT se divide en tres partes
+    1. Header
+        * Tiene información sobe el algoritmo de encriptación junto con el tipo del tocken
+    2. Payload
+        * Información que nosotros queramos que esté en el token.
+    3. Firma
+        * Permite a los verificadores del JWM si es un token válido.
