@@ -4,9 +4,65 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Google SignIn</title>
 </head>
 <body>
-    <h1>Acceso denegado</h1>
+    <h1>Pruebas</h1>
+    <hr>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <div id="g_id_onload"
+       data-client_id="632216956022-jbq3el5c53pukdud2hg1t98qegtvg91v.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse"
+       data-login_uri="https://your.domain/your_login_endpoint"
+       data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+       data-type="standard"
+       data-size="large"
+       data-theme="outline"
+       data-text="sign_in_with"
+       data-shape="rectangular"
+       data-logo_alignment="left">
+    </div>
+
+    <button id="google-signout">
+        SignOut
+    </button>
+    <script>
+        async function handleCredentialResponse(response) {
+            // decodeJwtResponse() is a custom function defined by you
+            // to decode the credential response.
+
+            // console.log(response.credential)
+
+            try {
+                const body = { id_token: response.credential };
+                
+                const request = await fetch('http://localhost:3000/api/v1/auth/google', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+                const { user } = await request.json();
+                localStorage.setItem('email', user.email)
+                console.log(value);
+            } catch (error) {
+                console.warn(error);
+            }
+        }
+
+        const btnSignOut = document.getElementById('google-signout');
+
+        btnSignOut.addEventListener('click', () => {
+            console.log(google.accounts.id);
+            google.accounts.id.disableAutoSelect();
+            google.accounts.id.revoke( localStorage.getItem('emai'), (done) => {
+                localStorage.clear();
+                location.reload();
+            });
+        });
+    </script>
 </body>
 </html>

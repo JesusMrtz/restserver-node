@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { generateJWT } from '../helpers/auth.js';
+import { generateJWT, googleVerify } from '../helpers/auth.js';
 import User from '../models/User.js';
 
 
@@ -32,6 +32,49 @@ export async function login(request, response) {
         response.status(500).json({
             ok: true,
             message: 'Error en el servidor',
+            error
+        })
+    }
+}
+
+export async function googleSignIn(request, response, next) {
+    try {
+        const { id_token } = request.body;
+        const { email, picture, name } = await googleVerify(id_token);
+
+        let user = await User.findOne({ email });
+
+        if ( !user ) {
+          const data = {
+              name, email,
+              image: picture,
+              google: true,
+              role: 'USER_ROLE',
+              password: ':p'
+          };
+      
+          user = new User(data);
+          await user.save();
+        }
+
+        if ( !user.state ) {
+            return response.status(401).json({
+                ok: false,
+                message: 'Hable con el administrador, usuario bloqueado.'
+            });
+        }
+
+        /** Generar el JWT  */
+        const token = await generateJWT(user.id);
+        response.json({
+            ok: true,
+            token,
+            user
+        });
+    } catch (error) {
+        response.status(500).json({
+            ok: false,
+            message: 'Error al iniciar sesión con google',
             error
         })
     }
