@@ -1,8 +1,13 @@
 import express from 'express';
 import cors from 'cors';
+
+import { dbConnection } from '../db/config.db.js';
+
 import v1Users from '../v1/routes/users.routes.js';
 import v1Auth from '../v1/routes/auth.routes.js';
-import { dbConnection } from '../db/config.db.js';
+import v1Categories from '../v1/routes/categories.routes.js';
+import v1Products from '../v1/routes/products.routes.js';
+import v1Searches from '../v1/routes/searches.routes.js';
 
 
 export class Server {
@@ -39,6 +44,9 @@ export class Server {
     routes() {
         this.app.use('/api/v1/auth', v1Auth);
         this.app.use('/api/v1/users', v1Users);
+        this.app.use('/api/v1/categories', v1Categories);
+        this.app.use('/api/v1/products', v1Products);
+        this.app.use('/api/v1/search', v1Searches);
     }
 
     listen() {

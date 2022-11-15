@@ -6,15 +6,15 @@ export async function getAllUsers(request, response) {
     try {
         const { limit = 5, skip = 0 } = request.query;
 
-        const [total, user] = await Promise.all([
-            User.countDocuments({ status: true }),
+        const [total, users] = await Promise.all([
+            User.countDocuments({ state: true }),
             User.find({ status: true }).skip(skip).limit(limit)
         ])
     
         return response.json({
             ok: true,
             total,
-            user
+            users
         });    
     } catch (error) {
         return response.status(500).json({
@@ -59,7 +59,7 @@ export async function updatedUser(request, response) {
             rest.password = bcrypt.hashSync(password, salt);
         }
 
-        const user = await User.findByIdAndUpdate( id, rest, { context: true } );
+        const user = await User.findByIdAndUpdate( id, rest, { new: true } );
         return response.json({
             ok: true,
             user

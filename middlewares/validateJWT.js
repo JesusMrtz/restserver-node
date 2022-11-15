@@ -22,7 +22,6 @@ export async function validateJWT(request, response, next) {
         request.authenticatedUser = user;
         next();
     } catch (error) {
-       console.log(error);
        response.status(401).json({
         ok: false,
         message: 'Token no válido',
