@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { check } from 'express-validator';
 import { hasRole, validateFields, validateJWT } from '../../middlewares/index.js';
-import { categoryExistsInDB } from '../../helpers/validate-categories.js';
+import { categoryExistsInDB } from '../../helpers/db-validators.js';
 import { createCategory, deletedCategory, getAllCategories, getCategory, updatedCategory } from '../../controllers/categories.controller.js';
 
 

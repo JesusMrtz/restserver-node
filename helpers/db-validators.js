@@ -1,15 +1,36 @@
 import Role from '../models/Role.js';
 import User from '../models/User.js';
+import Category from "../models/Category.js";
+import Product from "../models/Product.js";
 
 
 export async function validateRole( role ) {
     const existRole = await Role.findOne({ role });
     if ( !existRole ) throw new Error(`El rol ${ role } no está registrado en la base de datos`);
+    return true
 }
 
 export async function userExistsInDB( id ) {
-    const user = await User.exists({ _id: id });
+    const user = await User.exists({ _id: id, state: true });
     if ( !user ) throw new Error('El usuario no existe en la base de datos');
+    return true
+}
+
+export async function categoryExistsInDB( id ) {
+    const category = await Category.exists({ _id: id, state: true });
+    if ( !category ) throw new Error('La categoria no existe en la base de datos');
+    return true
+}
+
+export async function productExistsInDB( id ) {
+    const product = await Product.exists({ _id: id, state: true });
+    if ( !product ) throw new Error('El producto no existe en la base de datos');
+}
+
+export async function allowedCollections(collection, collections) {
+    const includedCollection = collections.includes(collection);
+    if ( !includedCollection ) throw new Error(`La colección ${ collection } no es permitida`);
+    return true;
 }
 
 export async function updateEmail( id, email ) {

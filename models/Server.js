@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import fileUpload from 'express-fileupload';
 
 import { dbConnection } from '../db/config.db.js';
 
@@ -8,6 +9,7 @@ import v1Auth from '../v1/routes/auth.routes.js';
 import v1Categories from '../v1/routes/categories.routes.js';
 import v1Products from '../v1/routes/products.routes.js';
 import v1Searches from '../v1/routes/searches.routes.js';
+import v1Upload from '../v1/routes/uploads.routes.js';
 
 
 export class Server {
@@ -39,6 +41,12 @@ export class Server {
         
         /** Directorio público */
         this.app.use(express.static('public'));
+
+        /**  Manejar la carga de archivos */
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/'
+        }));
     }
 
     routes() {
@@ -47,6 +55,7 @@ export class Server {
         this.app.use('/api/v1/categories', v1Categories);
         this.app.use('/api/v1/products', v1Products);
         this.app.use('/api/v1/search', v1Searches);
+        this.app.use('/api/v1/uploads', v1Upload);
     }
 
     listen() {

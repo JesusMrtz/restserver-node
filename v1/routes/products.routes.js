@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { check } from "express-validator";
-import { categoryExistsInDB } from "../../helpers/validate-categories.js";
-import { productExistsInDB } from "../../helpers/validate-products.js";
+import { categoryExistsInDB } from "../../helpers/db-validators.js";
+import { productExistsInDB } from "../../helpers/db-validators.js";
 import { hasRole, validateFields, validateJWT } from '../../middlewares/index.js';
 import { createProduct, deletedProduct, getAllProducts, getProduct, updatedProduct } from "../../controllers/products.controller.js";
 
