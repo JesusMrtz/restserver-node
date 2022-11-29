@@ -1,21 +1,23 @@
 import express from 'express';
+import { createServer } from 'http';
+import { Server as SocketServer } from 'socket.io';
 import cors from 'cors';
 import fileUpload from 'express-fileupload';
 
 import { dbConnection } from '../db/config.db.js';
 
-import v1Users from '../v1/routes/users.routes.js';
-import v1Auth from '../v1/routes/auth.routes.js';
-import v1Categories from '../v1/routes/categories.routes.js';
-import v1Products from '../v1/routes/products.routes.js';
-import v1Searches from '../v1/routes/searches.routes.js';
-import v1Upload from '../v1/routes/uploads.routes.js';
+import v1Routes from '../v1/routes/index.routes.js';
+import { socketController } from '../sockets/SocketController.js';
 
 
 export class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
+
+        // Configuración para el SocketIO
+        this.server = createServer(this.app);
+        this.io = new SocketServer(this.server);
 
         // Conectar a base de datos
         this.connectDatabase();
@@ -26,6 +28,9 @@ export class Server {
 
         // Rutas de la aplicación
         this.routes();
+
+        // Escuchar eventos de los sockets
+        this.sockets();
     }
 
     async connectDatabase() {
@@ -50,16 +55,20 @@ export class Server {
     }
 
     routes() {
-        this.app.use('/api/v1/auth', v1Auth);
-        this.app.use('/api/v1/users', v1Users);
-        this.app.use('/api/v1/categories', v1Categories);
-        this.app.use('/api/v1/products', v1Products);
-        this.app.use('/api/v1/search', v1Searches);
-        this.app.use('/api/v1/uploads', v1Upload);
+        this.app.use('/api/v1/auth', v1Routes.v1Auth);
+        this.app.use('/api/v1/users', v1Routes.v1Users);
+        this.app.use('/api/v1/categories', v1Routes.v1Categories);
+        this.app.use('/api/v1/products', v1Routes.v1Products);
+        this.app.use('/api/v1/search', v1Routes.v1Searches);
+        this.app.use('/api/v1/uploads', v1Routes.v1Upload);
+    }
+
+    sockets() {
+        this.io.on('connection', (socket) => socketController(socket, this.io));
     }
 
     listen() {
-        this.app.listen(this.port , () => {
+        this.server.listen(this.port , () => {
             console.log('Servidor corriendo en el puerto', this.port);
         });
     }
