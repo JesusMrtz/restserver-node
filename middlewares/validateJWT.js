@@ -29,3 +29,15 @@ export async function validateJWT(request, response, next) {
        }) 
     }
 }
+
+export async function checkJWT(token) {
+    try {
+        if ( !token.length ) return null;
+        
+        const { uid } = jwt.verify(token, process.env.SECRET_KEY);
+        const user = await User.findOne({ _id: uid, state: true });
+        return (user) ? user : null;
+    } catch (error) {
+        return null;
+    }
+}

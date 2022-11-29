@@ -37,7 +37,7 @@ export async function login(request, response) {
     }
 }
 
-export async function googleSignIn(request, response, next) {
+export async function googleSignIn(request, response) {
     try {
         const { id_token } = request.body;
         const { email, picture, name } = await googleVerify(id_token);
@@ -64,6 +64,7 @@ export async function googleSignIn(request, response, next) {
             });
         }
 
+
         /** Generar el JWT  */
         const token = await generateJWT(user.id);
         response.json({
@@ -75,6 +76,27 @@ export async function googleSignIn(request, response, next) {
         response.status(500).json({
             ok: false,
             message: 'Error al iniciar sesión con google',
+            error
+        })
+    }
+}
+
+export async function refreshToken(request, response) {
+    try {
+        const { authenticatedUser } = request;
+
+        /** Generar el token */
+        const token = await generateJWT(authenticatedUser.id);
+    
+        return response.status(200).json({
+            ok: true,
+            user: authenticatedUser,
+            token
+        });   
+    } catch (error) {
+        return response.status(500).json({
+            ok: false,
+            message: 'Hubo un error al renovar el token',
             error
         })
     }
